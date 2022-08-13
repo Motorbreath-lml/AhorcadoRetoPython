@@ -1,0 +1,6 @@
+#Ignorar la carpeta del entorno virtual
+#para compartir lo requirimientos del entorno podriamos usar el siguiente comando
+# pip freeze > requirements.txt
+# para instalarlo
+# pip install -r requirements.txt
+venv/
