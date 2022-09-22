@@ -1,12 +1,3 @@
-def run():
-    for item in hangman():
-        print(item)
-
-
-if __name__ == '__main__':
-    run()
-
-    
 def hangman():
     oportunidad=[
                 """
@@ -65,3 +56,11 @@ def hangman():
                 """
     ]
     return oportunidad
+
+def run():
+    for item in hangman():
+        print(item)
+
+
+if __name__ == '__main__':
+    run()
