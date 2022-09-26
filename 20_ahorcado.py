@@ -98,7 +98,15 @@ def limpiar_pantalla():
 def jugar(dificultad):
     lista=lista_palabras()
     indice=random.randint(0,len(lista)-1)
-    print("indice: "+str(indice)+" No.Palabras: "+str(len(lista)))
+    palabra=lista[indice]
+    diccionario_palabra={letra:[] for letra in palabra if letra!='\n'}
+    for i in range(len(palabra)-1):
+        diccionario_palabra[palabra[i]].append(i)
+    ahorcado=hangman()
+    intentos=-1
+    print("indice: "+str(indice)+" No.Palabras: "+str(len(lista))+" Palabra: "+palabra)
+    print("EL diccionario")
+    print(diccionario_palabra)
 
 
 
