@@ -2,6 +2,8 @@ from ast import While
 import platform
 import os
 import random
+from runpy import run_path
+import re
 
 def hangman():
     oportunidad=[
@@ -95,29 +97,101 @@ def limpiar_pantalla():
     os.system(sistema)
 
 
+def game_over(conseguido,palabra):
+    limpiar_pantalla()
+    banner=""
+    ruta="./files/"
+    if conseguido:
+        ruta+="win"
+    else:
+        ruta+="lose"
+    ruta+=".txt"
+    with open(ruta, "r",encoding="utf-8") as f: 
+        for line in f:
+            banner+=line
+    print(banner)
+    input("La palabra es: "+palabra+"\nPresiona una enter para salir al menu principal")
+
+
+def letra_encontrada(diccionario_palabra,letra_entrada,mostrar_palabra):
+    for indice in diccionario_palabra[letra_entrada]:
+        mostrar_palabra[indice]=" "+letra_entrada+" "
+    del diccionario_palabra[letra_entrada]
+
+
+def letra_azar(dificultad,diccionario_palabra,mostrar_palabra):
+    regex=""
+    if dificultad==1:
+        regex="[aeiou]"
+    else:
+        regex="[^aeiou]"
+
+    for key in diccionario_palabra:
+        x=re.search(regex,key)
+        if x:
+            letra_encontrada(diccionario_palabra,key,mostrar_palabra)
+            break
+
+def dificultad_letrero(dificultad):
+    if (dificultad==2):
+        dificultad_letra="Dificil"
+    elif (dificultad==1):
+        dificultad_letra="Intermedio"
+    else: 
+        dificultad_letra="Facil"
+    return dificultad_letra
+
+
 def jugar(dificultad):
     lista=lista_palabras()
     indice=random.randint(0,len(lista)-1)
     palabra=lista[indice]
     diccionario_palabra={letra:[] for letra in palabra if letra!='\n'}
+    mostrar_palabra=[" _ " for letra in palabra if letra !='\n']
     for i in range(len(palabra)-1):
         diccionario_palabra[palabra[i]].append(i)
     ahorcado=hangman()
     intentos=-1
+    conseguido=False
+
+    dificultad_letra=dificultad_letrero(dificultad)
+    
+    if dificultad!=2:        
+        letra_azar(dificultad,diccionario_palabra,mostrar_palabra)
+
+
+    while intentos<6 and not conseguido:
+        limpiar_pantalla()
+        print("Numero de intentos: "+str(intentos+1)+" Dificultad: "+dificultad_letra)
+        if intentos>-1:
+            print(ahorcado[intentos])
+        for caracter in mostrar_palabra:
+            print(caracter,end="")
+        print("\n")
+        letra_entrada=input("Teclea una letra, que piense que este en la palabra\n: ")
+        if diccionario_palabra.get(letra_entrada) is not None:
+            letra_encontrada(diccionario_palabra,letra_entrada,mostrar_palabra)            
+        else:
+            intentos+=1
+        if(len(diccionario_palabra)==0):
+            conseguido=True
+    
+    game_over(conseguido,palabra)
+
     print("indice: "+str(indice)+" No.Palabras: "+str(len(lista))+" Palabra: "+palabra)
     print("EL diccionario")
     print(diccionario_palabra)
 
 
-
-
-def run():
+def run():    
     banner=banner_inicio()    
     salir=True
     dificultad=0
 
     while salir==True:
+        limpiar_pantalla()
         print(banner)
+        print("Dificultad: "+dificultad_letrero(dificultad))
         print("Selecciona una opcion del menu, presionando la tecla correspondiente y enter")
         seleccion=input("\n1 - Jugar\n2 - Seleccionar dificultad\n3 - Revisar la lista de palabras\n0 - Salir\n")
         #El siguiente switch solo funciona en python 3.10
@@ -133,6 +207,7 @@ def run():
             case "3": #Lista de palabras
                 for palabra in lista_palabras():
                     print(palabra)
+                input("Presiona enter para continuar.")
             case "0": #Salir
                 salir=False
             case _:
